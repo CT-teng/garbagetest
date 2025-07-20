@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>智能垃圾桶管理</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 400px; margin: 40px auto; }
+        .status { margin: 15px 0; }
+        input, button { padding: 8px; margin: 5px 0; width: 100%; }
+    </style>
+</head>
+<body>
+    <h2>垃圾桶状态</h2>
+    <div id="bin-status" class="status">
+        加载中...
+    </div>
+    <hr>
+    <h3>积分查询</h3>
+    <input id="phone" type="tel" maxlength="11" placeholder="输入手机号">
+    <button onclick="getPoints()">查询积分</button>
+    <div id="points-status" style="margin-top:5px;"></div>
+    <button onclick="throwGarbage()">投放一次垃圾</button>
+
+    <script>
+        // =========================
+        // 以下为本地模拟数据/接口
+        // =========================
+        let binId = '001';
+        let bins = {
+            '001': { id: '001', full: false, throws: 0 }
+        };
+        let userPoints = {}; // { phone: 积分 }
+
+        // 显示垃圾桶状态（模拟后端获取）
+        function fetchBinStatus() {
+            const bin = bins[binId];
+            document.getElementById('bin-status').innerHTML =
+                `编号：${bin.id}<br>当前状态：${bin.full ? '<span style="color:red;">已满</span>' : '未满'}`;
+        }
+        fetchBinStatus();
+
+        // 查询积分（模拟接口）
+        function getPoints() {
+            let phone = document.getElementById('phone').value;
+            if (!/^1\d{10}$/.test(phone)) {
+                alert('请输入有效的手机号');
+                return;
+            }
+            let points = userPoints[phone] || 0;
+            document.getElementById('points-status').innerText = `当前积分：${points}`;
+        }
+
+        // 投放垃圾并加积分（本地模拟逻辑）
+        function throwGarbage() {
+            let phone = document.getElementById('phone').value;
+            if (!/^1\d{10}$/.test(phone)) {
+                alert('请输入有效的手机号');
+                return;
+            }
+            // 积分加1
+            userPoints[phone] = (userPoints[phone] || 0) + 1;
+
+            // 模拟垃圾桶投放
+            const bin = bins[binId];
+            bin.throws += 1;
+            if (bin.throws >= 10) {
+                bin.full = true;
+                bin.throws = 0;
+            } else {
+                bin.full = false;
+            }
+            document.getElementById('points-status').innerText =
+                `投放成功！当前积分：${userPoints[phone]}`;
+            fetchBinStatus();
+        }
+    </script>
+</body>
+</html>
